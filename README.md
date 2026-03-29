@@ -1,614 +1,534 @@
 
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Артём | Liquid Glass Dev — Unity Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOUR NAME — Unity Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #09090f;
+  --glass-bg:   rgba(255,255,255,0.055);
+  --glass-bg-h: rgba(255,255,255,0.09);
+  --glass-bo:   rgba(255,255,255,0.13);
+  --glass-bo-h: rgba(255,255,255,0.28);
+  --glass-shine:rgba(255,255,255,0.55);
+  --blur: 24px;
+  --t1: #f0f4ff;
+  --t2: rgba(210,220,255,0.55);
+  --t3: rgba(180,200,255,0.3);
+  --ice: #aee8ff;
+  --r-sm:16px; --r-md:24px; --r-lg:32px; --r-xl:48px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
 
-        body {
-            background: #0a0c12;
-            font-family: 'Space Grotesk', sans-serif;
-            color: #eef5ff;
-            line-height: 1.5;
-            overflow-x: hidden;
-        }
+/* CURSOR */
+#cur-dot{position:fixed;width:8px;height:8px;background:#fff;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .2s,height .2s}
+#cur-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(255,255,255,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s;backdrop-filter:blur(2px)}
+.cursor-hover #cur-dot{width:14px;height:14px;background:var(--ice)}
+.cursor-hover #cur-ring{width:52px;height:52px;border-color:rgba(174,232,255,.7)}
 
-        /* animated liquid gradient background */
-        .liquid-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: radial-gradient(circle at 20% 30%, #0d111c, #03050a);
-        }
+/* BLOBS */
+#blob-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
+.b1{width:700px;height:700px;background:radial-gradient(circle,#1a2fff 0%,transparent 70%);top:-200px;left:-180px;opacity:.55;animation:da 22s ease-in-out infinite}
+.b2{width:600px;height:600px;background:radial-gradient(circle,#0af 0%,transparent 70%);top:30%;right:-160px;opacity:.42;animation:db 18s ease-in-out infinite}
+.b3{width:500px;height:500px;background:radial-gradient(circle,#6e40ff 0%,transparent 70%);bottom:10%;left:20%;opacity:.32;animation:dc 26s ease-in-out infinite}
+.b4{width:400px;height:400px;background:radial-gradient(circle,#00d4ff 0%,transparent 70%);bottom:-100px;right:10%;opacity:.38;animation:dd 20s ease-in-out infinite}
+@keyframes da{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(80px,60px) scale(1.1)}66%{transform:translate(-40px,100px) scale(.95)}}
+@keyframes db{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(-100px,-80px) scale(1.15)}70%{transform:translate(60px,40px) scale(.9)}}
+@keyframes dc{0%,100%{transform:translate(0,0) scale(1)}30%{transform:translate(120px,-60px) scale(1.05)}60%{transform:translate(-80px,80px) scale(1.1)}}
+@keyframes dd{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-120px,-100px) scale(1.2)}}
 
-        .glass-orb {
-            position: fixed;
-            width: 70vw;
-            height: 70vw;
-            background: radial-gradient(circle, rgba(80, 180, 255, 0.2), rgba(0, 255, 255, 0.02));
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
-            animation: floatLiquid 18s infinite alternate ease-in-out;
-        }
+/* OVERLAY + NOISE */
+#vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 0%,transparent 40%,rgba(9,9,15,.85) 100%),radial-gradient(ellipse 100% 100% at 50% 50%,transparent 55%,rgba(9,9,15,.6) 100%)}
+#noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-        .glass-orb2 {
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 60vw;
-            height: 60vw;
-            background: radial-gradient(circle, rgba(255, 80, 200, 0.15), rgba(0, 255, 255, 0.0));
-            filter: blur(100px);
-            z-index: -1;
-            animation: floatLiquid2 22s infinite alternate;
-        }
+/* GLASS BASE */
+.glass{background:var(--glass-bg);backdrop-filter:blur(var(--blur)) saturate(160%) brightness(1.08);-webkit-backdrop-filter:blur(var(--blur)) saturate(160%) brightness(1.08);border:1px solid var(--glass-bo);position:relative;overflow:hidden}
+.glass::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,var(--glass-shine) 40%,rgba(255,255,255,.15) 70%,transparent 100%);pointer-events:none;z-index:1}
+.glass::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.055) 0%,transparent 100%);border-radius:inherit;pointer-events:none;z-index:1}
 
-        @keyframes floatLiquid {
-            0% { transform: translate(-5%, -5%) scale(1); opacity: 0.5; }
-            100% { transform: translate(10%, 15%) scale(1.2); opacity: 0.8; }
-        }
-        @keyframes floatLiquid2 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-8%, -12%) scale(1.25); }
-        }
+/* SCROLL BAR */
+#progress{position:fixed;top:0;left:0;height:1.5px;z-index:200;background:linear-gradient(90deg,rgba(174,232,255,0),var(--ice),rgba(100,180,255,.8));width:0;transition:width .12s linear}
 
-        /* glass morphism card style */
-        .glass-card {
-            background: rgba(20, 25, 40, 0.45);
-            backdrop-filter: blur(14px);
-            border-radius: 2rem;
-            border: 1px solid rgba(100, 210, 255, 0.25);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
-            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
+/* NAV */
+nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:100px;transition:box-shadow .4s}
+nav.scrolled{box-shadow:0 8px 48px rgba(0,0,0,.6),0 0 0 .5px rgba(255,255,255,.08)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:var(--t1);text-decoration:none;padding:4px 16px;white-space:nowrap;letter-spacing:-.01em}
+.nav-logo em{font-style:normal;color:var(--ice)}
+.ndiv{width:1px;height:20px;background:var(--glass-bo)}
+.nav-links{display:flex;gap:2px;list-style:none}
+.nav-links a{display:block;padding:7px 14px;font-size:.78rem;font-weight:500;color:var(--t2);text-decoration:none;border-radius:100px;transition:color .2s,background .2s}
+.nav-links a:hover{color:var(--t1);background:rgba(255,255,255,.07)}
 
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            position: relative;
-            z-index: 5;
-        }
+/* LAYOUT */
+.wrap{max-width:1160px;margin:0 auto;padding:0 32px;position:relative;z-index:3}
+section{padding:140px 0 0}
+section:last-of-type{padding-bottom:140px}
 
-        /* hero */
-        .hero {
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-            gap: 1.5rem;
-            padding: 4rem 0;
-        }
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
 
-        .liquid-badge {
-            background: rgba(0, 255, 255, 0.08);
-            backdrop-filter: blur(12px);
-            padding: 0.5rem 1.2rem;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            letter-spacing: 1px;
-            border: 1px solid rgba(0, 255, 255, 0.4);
-            color: #8effff;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+/* SECTION LABEL */
+.sec-label{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--ice);margin-bottom:20px;padding:5px 14px 5px 10px;border-radius:100px;background:rgba(174,232,255,.07);border:1px solid rgba(174,232,255,.18)}
+.sec-label::before{content:'';width:6px;height:6px;background:var(--ice);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(174,232,255,.5)}50%{box-shadow:0 0 0 5px rgba(174,232,255,0)}}
+.sec-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.4rem,5vw,4rem);line-height:1;letter-spacing:-.03em;color:var(--t1);margin-bottom:56px}
+.sec-title span{color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.25)}
 
-        h1 {
-            font-size: clamp(3rem, 8vw, 5.5rem);
-            font-weight: 600;
-            line-height: 1.2;
-            background: linear-gradient(135deg, #ffffff 20%, #88ddff 50%, #c084fc 80%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.02em;
-        }
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px}
+.hero-inner{display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;margin-bottom:32px;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--t1)}
+.hero-pill::before{content:'';width:6px;height:6px;background:#7fffbe;border-radius:50%;animation:pg 2s infinite;flex-shrink:0}
+@keyframes pg{0%,100%{box-shadow:0 0 0 0 rgba(127,255,190,.5)}50%{box-shadow:0 0 0 5px rgba(127,255,190,0)}}
+.hero-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(3.5rem,8vw,7.5rem);line-height:.95;letter-spacing:-.04em;margin-bottom:24px}
+.hero-h1 .role{display:block;background:linear-gradient(120deg,rgba(255,255,255,.95) 0%,var(--ice) 50%,rgba(100,140,255,.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-h1 .sub{display:block;font-weight:400;font-size:.36em;letter-spacing:.06em;-webkit-text-fill-color:var(--t2);color:var(--t2);margin-top:10px}
+.hero-desc{font-size:1rem;line-height:1.75;color:var(--t2);max-width:460px;margin-bottom:40px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:56px}
 
-        .glow-text {
-            text-shadow: 0 0 12px rgba(0, 200, 255, 0.3);
-        }
+.hero-stats{display:inline-flex;border-radius:var(--r-md)}
+.stat{padding:20px 28px;border-right:1px solid var(--glass-bo)}
+.stat:first-child{border-left:1px solid var(--glass-bo);border-radius:var(--r-md) 0 0 var(--r-md)}
+.stat:last-child{border-radius:0 var(--r-md) var(--r-md) 0}
+.stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--t1);line-height:1}
+.stat-l{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:4px}
 
-        .hero-desc {
-            font-size: 1.15rem;
-            max-width: 580px;
-            color: #b9d0f5;
-            font-weight: 300;
-        }
+/* HERO CARD */
+.hero-card{width:280px;border-radius:var(--r-xl);padding:32px 24px;text-align:center;flex-shrink:0;box-shadow:0 32px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.18)}
+.hero-avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,rgba(30,80,255,.3),rgba(0,200,255,.2));border:1px solid rgba(255,255,255,.15);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;box-shadow:0 0 30px rgba(100,180,255,.25)}
+.hero-card-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:4px}
+.hero-card-role{font-size:.72rem;color:var(--t2);letter-spacing:.06em;margin-bottom:20px}
+.hero-card-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.hctag{padding:4px 10px;border-radius:100px;font-size:.62rem;letter-spacing:.08em;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--t2)}
+.avail{display:inline-flex;align-items:center;gap:6px;margin-top:20px;padding:7px 14px;border-radius:100px;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(100,255,180,.08);border:1px solid rgba(100,255,180,.2);color:#7fffbe}
+.avail::before{content:'';width:6px;height:6px;background:#7fffbe;border-radius:50%;animation:pg 2s infinite}
 
-        .btn-group {
-            display: flex;
-            gap: 1.2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 1rem;
-        }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;letter-spacing:.02em;text-decoration:none;cursor:none;transition:transform .2s,box-shadow .2s,background .2s;border:none;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-solid{background:#fff;color:#090916;box-shadow:0 4px 24px rgba(255,255,255,.12)}
+.btn-solid:hover{background:var(--ice);box-shadow:0 8px 40px rgba(174,232,255,.4)}
+.btn-glass{color:var(--t1);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 24px rgba(0,0,0,.3)}
+.btn-glass:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 40px rgba(0,0,0,.4)}
 
-        .btn-glass {
-            padding: 0.85rem 2rem;
-            border-radius: 48px;
-            font-weight: 500;
-            transition: all 0.25s ease;
-            text-decoration: none;
-            backdrop-filter: blur(8px);
-        }
-        .btn-primary-glass {
-            background: rgba(0, 210, 255, 0.2);
-            border: 1px solid rgba(0, 255, 255, 0.6);
-            color: #0ff;
-            box-shadow: 0 0 12px rgba(0, 200, 255, 0.2);
-        }
-        .btn-primary-glass:hover {
-            background: #0ff;
-            color: #0a0c12;
-            border-color: #fff;
-            box-shadow: 0 0 24px #0ff;
-            transform: scale(1.02);
-        }
-        .btn-outline-glass {
-            border: 1px solid rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.02);
-            color: #d9eaff;
-        }
-        .btn-outline-glass:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: #0ff;
-            color: #0ff;
-        }
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.skill-card{padding:32px 28px;border-radius:var(--r-lg);box-shadow:0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);transition:transform .3s,box-shadow .3s,background .3s}
+.skill-card:hover{transform:translateY(-6px) scale(1.01);background:var(--glass-bg-h);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.18),inset 0 1px 0 rgba(255,255,255,.2)}
+.sk-icon{font-size:1.8rem;margin-bottom:18px}
+.sk-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:10px;color:var(--t1)}
+.sk-desc{font-size:.8rem;color:var(--t2);line-height:1.7;margin-bottom:18px}
+.sk-tags{display:flex;flex-wrap:wrap;gap:6px}
+.sk-tag{padding:3px 10px;font-size:.62rem;letter-spacing:.06em;border-radius:100px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--t2)}
 
-        section {
-            padding: 5rem 0;
-        }
+/* WORK CARDS */
+.works-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.work-card{border-radius:var(--r-lg);overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.1);transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s;transform-style:preserve-3d}
+.work-card:hover{transform:translateY(-10px) rotateX(2deg);box-shadow:0 30px 80px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.16),inset 0 1px 0 rgba(255,255,255,.2),0 0 60px rgba(100,180,255,.12)}
 
-        .section-title {
-            font-size: 2.2rem;
-            font-weight: 500;
-            letter-spacing: -0.3px;
-            margin-bottom: 2rem;
-            display: inline-block;
-            background: linear-gradient(120deg, #fff, #aaffff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
+.work-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,rgba(20,40,120,.4),rgba(80,20,180,.3));display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden}
+.work-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.work-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(9,9,15,.9) 100%);z-index:1}
 
-        /* filter chips */
-        .filter-group {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            margin-bottom: 3rem;
-        }
-        .filter-chip {
-            background: rgba(30, 40, 60, 0.5);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            padding: 0.5rem 1.4rem;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #ccf;
-        }
-        .filter-chip.active, .filter-chip:hover {
-            background: rgba(0, 255, 255, 0.2);
-            border-color: #0ff;
-            color: white;
-            box-shadow: 0 0 12px rgba(0,255,200,0.3);
-        }
+.work-badge{position:absolute;top:14px;left:14px;z-index:2;padding:4px 12px;border-radius:100px;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.badge-game{background:rgba(174,232,255,.15);border:1px solid rgba(174,232,255,.3);color:var(--ice)}
+.badge-app{background:rgba(180,255,200,.12);border:1px solid rgba(180,255,200,.25);color:#a0ffc0}
 
-        /* project grid liquid glass cards */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-            gap: 2rem;
-        }
+.work-links{position:absolute;bottom:16px;right:16px;z-index:2;display:flex;gap:8px;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s}
+.work-card:hover .work-links{opacity:1;transform:none}
+.wlnk{padding:7px 16px;border-radius:100px;font-size:.65rem;letter-spacing:.06em;font-weight:600;text-decoration:none;cursor:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(10px);transition:background .2s}
+.wlnk:hover{background:rgba(255,255,255,.22)}
+.wlnk.primary{background:rgba(255,255,255,.9);color:#09090f}
+.wlnk.primary:hover{background:#fff}
 
-        .project-liquid {
-            background: rgba(18, 24, 36, 0.5);
-            backdrop-filter: blur(16px);
-            border-radius: 2rem;
-            overflow: hidden;
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            transition: all 0.35s ease;
-            cursor: pointer;
-            transform: translateY(0);
-        }
-        .project-liquid:hover {
-            transform: translateY(-8px);
-            border-color: #0ff;
-            box-shadow: 0 20px 35px -12px rgba(0, 200, 255, 0.25);
-            background: rgba(25, 35, 55, 0.6);
-        }
-        .project-img {
-            width: 100%;
-            height: 220px;
-            background-size: cover;
-            background-position: center;
-            transition: transform 0.5s ease;
-        }
-        .project-liquid:hover .project-img {
-            transform: scale(1.03);
-        }
-        .project-info {
-            padding: 1.5rem;
-        }
-        .project-tag {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #7efff0;
-            font-weight: 500;
-        }
-        .project-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-            margin: 0.5rem 0 0.4rem;
-        }
-        .project-desc {
-            font-size: 0.85rem;
-            color: #b7cef0;
-            margin-bottom: 1rem;
-        }
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        .tech-badge-glass {
-            background: rgba(0, 255, 255, 0.1);
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 400;
-            backdrop-filter: blur(2px);
-        }
+.work-body{padding:24px}
+.work-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--t1);margin-bottom:8px}
+.work-desc{font-size:.8rem;color:var(--t2);line-height:1.7;margin-bottom:16px}
+.work-tech{display:flex;flex-wrap:wrap;gap:6px}
+.ttag{padding:3px 10px;border-radius:100px;font-size:.62rem;letter-spacing:.06em;background:rgba(174,232,255,.07);border:1px solid rgba(174,232,255,.15);color:rgba(174,232,255,.7)}
 
-        /* skills with liquid glass */
-        .skills-glass {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            background: rgba(12, 20, 32, 0.4);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 2rem;
-            border: 1px solid rgba(0, 255, 255, 0.2);
-        }
-        .skill-block {
-            flex: 1;
-        }
-        .skill-block h3 {
-            color: #6efff0;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-        .skill-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-        .skill-pill {
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 255, 200, 0.3);
-            padding: 0.35rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 400;
-            backdrop-filter: blur(4px);
-        }
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:stretch}
+.about-text-card{padding:48px;border-radius:var(--r-xl);box-shadow:0 8px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12)}
+.about-text-card p{font-size:.9rem;color:var(--t2);line-height:1.85;margin-bottom:18px}
+.about-text-card p strong{color:var(--t1);font-weight:500}
+.about-text-card p:last-of-type{margin-bottom:32px}
+.about-code{border-radius:var(--r-xl);padding:36px 32px;box-shadow:0 8px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12);font-size:.77rem;line-height:1.85}
+.cl{display:flex;gap:12px}
+.ln{color:var(--t3);min-width:20px;text-align:right;user-select:none}
+.kw{color:#c8a3ff}.ty{color:#7dd3fc}.fn{color:#86efac}.st{color:#fde68a}.cm{color:var(--t3)}
+.cb{display:inline-block;width:7px;height:13px;background:var(--ice);vertical-align:text-bottom;animation:blink .9s step-end infinite;border-radius:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-        /* contact glass */
-        .contact-glass {
-            background: rgba(20, 28, 44, 0.4);
-            backdrop-filter: blur(16px);
-            border-radius: 2rem;
-            padding: 2rem;
-            text-align: center;
-            border: 1px solid rgba(0, 255, 255, 0.25);
-        }
-        .contact-icons {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-        }
-        .contact-icons a {
-            color: #c0e0ff;
-            font-size: 1.2rem;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .contact-icons a:hover {
-            color: #0ff;
-            text-shadow: 0 0 8px cyan;
-        }
+/* CONTACT */
+#contact{text-align:center}
+.contact-pill{display:inline-block;padding:80px 80px 72px;border-radius:48px;box-shadow:0 40px 100px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18);max-width:700px;width:100%}
+.contact-h{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-.03em;margin-bottom:14px}
+.contact-sub{font-size:.9rem;color:var(--t2);margin-bottom:40px;line-height:1.6}
+.contact-links{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.clnk{display:flex;align-items:center;gap:9px;padding:12px 22px;border-radius:100px;font-size:.78rem;font-weight:500;letter-spacing:.04em;text-decoration:none;color:var(--t1);cursor:none;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);transition:transform .2s,background .2s,box-shadow .2s}
+.clnk:hover{transform:translateY(-3px);background:rgba(255,255,255,.12);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 20px rgba(174,232,255,.12)}
+.clnk svg{width:16px;height:16px;opacity:.7}
 
-        /* modal for screenshots */
-        .glass-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-        .glass-modal.active {
-            display: flex;
-        }
-        .modal-inner {
-            max-width: 85vw;
-            max-height: 85vh;
-            border-radius: 2rem;
-            border: 1px solid rgba(0, 255, 255, 0.5);
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 200, 255, 0.3);
-        }
-        .modal-inner img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+/* FOOTER */
+footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06);position:relative;z-index:3}
+.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.foot-copy{font-size:.72rem;color:var(--t3)}
+.foot-copy em{font-style:normal;color:var(--ice)}
+.foot-up{font-size:.72rem;color:var(--t3);text-decoration:none;letter-spacing:.08em;cursor:none;transition:color .2s}
+.foot-up:hover{color:var(--t1)}
 
-        footer {
-            text-align: center;
-            padding: 2rem;
-            font-size: 0.8rem;
-            color: #8bb3dd;
-            border-top: 1px solid rgba(0,255,255,0.1);
-        }
-        .scroll-top {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 48px;
-            height: 48px;
-            border-radius: 60px;
-            background: rgba(0, 200, 255, 0.2);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0,255,255,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: 0.3s;
-            pointer-events: none;
-            z-index: 99;
-            color: #0ff;
-        }
-        .scroll-top.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        @media (max-width: 700px) {
-            .container { padding: 0 1.2rem; }
-            .skills-glass { flex-direction: column; }
-        }
-    </style>
+@media(max-width:860px){
+  .hero-inner{grid-template-columns:1fr}
+  .hero-card{width:100%;max-width:320px}
+  .about-grid{grid-template-columns:1fr}
+  .wrap{padding:0 20px}
+  nav .nav-links,.ndiv{display:none}
+}
+</style>
 </head>
 <body>
-<div class="liquid-bg"></div>
-<div class="glass-orb"></div>
-<div class="glass-orb2"></div>
 
-<div class="scroll-top" id="scrollTopBtn"><i class="fas fa-chevron-up"></i></div>
-
-<div class="container">
-    <div class="hero">
-        <div class="liquid-badge">
-            <i class="fas fa-droplet"></i> LIQUID GLASS / UNITY CRAFT
-        </div>
-        <h1>ИГРЫ <span class="glow-text">+<br>ПРИЛОЖЕНИЯ</span><br> НА UNITY</h1>
-        <p class="hero-desc">Разработчик, превращающий идеи в текучие цифровые миры. 2 приложения, 3 игры — каждый проект дышит эстетикой и инновациями.</p>
-        <div class="btn-group">
-            <a href="#projects" class="btn-glass btn-primary-glass"><i class="fas fa-glasses"></i> Проекты</a>
-            <a href="#contact" class="btn-glass btn-outline-glass"><i class="fas fa-paper-plane"></i> Контакт</a>
-        </div>
-    </div>
-
-    <section id="projects">
-        <h2 class="section-title">/ fluid portfolio</h2>
-        <div class="filter-group">
-            <button class="filter-chip active" data-filter="all">Все работы</button>
-            <button class="filter-chip" data-filter="game">🎮 Игры (3)</button>
-            <button class="filter-chip" data-filter="app">📱 Приложения (2)</button>
-        </div>
-        <div class="projects-grid" id="projectsGrid"></div>
-    </section>
-
-    <section id="skills">
-        <h2 class="section-title">/ liquid toolset</h2>
-        <div class="skills-glass">
-            <div class="skill-block">
-                <h3><i class="fab fa-unity"></i> Unity ecosystem</h3>
-                <div class="skill-items">
-                    <span class="skill-pill">C# / .NET</span>
-                    <span class="skill-pill">URP/HDRP</span>
-                    <span class="skill-pill">Unity DOTS</span>
-                    <span class="skill-pill">Shaders Graph</span>
-                    <span class="skill-pill">Timeline/Cinemachine</span>
-                </div>
-            </div>
-            <div class="skill-block">
-                <h3><i class="fas fa-mobile-alt"></i> Mobile & backend</h3>
-                <div class="skill-items">
-                    <span class="skill-pill">Firebase</span>
-                    <span class="skill-pill">REST APIs</span>
-                    <span class="skill-pill">AdMob / IronSource</span>
-                    <span class="skill-pill">In-App Purchases</span>
-                    <span class="skill-pill">Android/iOS</span>
-                </div>
-            </div>
-            <div class="skill-block">
-                <h3><i class="fas fa-crown"></i> Design patterns</h3>
-                <div class="skill-items">
-                    <span class="skill-pill">Zenject/DI</span>
-                    <span class="skill-pill">MVVM/MVC</span>
-                    <span class="skill-pill">Addressables</span>
-                    <span class="skill-pill">Git LFS</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact">
-        <h2 class="section-title">/ flow state contact</h2>
-        <div class="contact-glass">
-            <p style="font-size: 1.1rem; margin-bottom: 0.8rem;">Давайте создадим что-то текучее и мощное.</p>
-            <div class="contact-icons">
-                <a href="#"><i class="fab fa-telegram"></i> Telegram</a>
-                <a href="#"><i class="fab fa-github"></i> GitHub</a>
-                <a href="#"><i class="fas fa-envelope"></i> liquid.dev@unity.me</a>
-            </div>
-            <div><i class="fas fa-map-pin"></i> работаю удаленно по всему миру</div>
-        </div>
-    </section>
-    <footer>
-        <i class="fas fa-water"></i> liquid glass interface — разработчик игр и приложений на Unity
-    </footer>
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+<div id="progress"></div>
+<div id="blob-layer">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="blob b3"></div><div class="blob b4"></div>
 </div>
+<div id="vignette"></div>
+<div id="noise"></div>
 
-<div id="screenshotModal" class="glass-modal">
-    <div class="modal-inner">
-        <img id="modalImgSrc" src="" alt="project screenshot">
+<!-- NAV -->
+<nav class="glass" id="nav">
+  <a href="#hero" class="nav-logo">YOUR<em>.</em>NAME</a>
+  <div class="ndiv"></div>
+  <ul class="nav-links">
+    <li><a href="#skills">Навыки</a></li>
+    <li><a href="#games">Игры</a></li>
+    <li><a href="#apps">Приложения</a></li>
+    <li><a href="#about">Обо мне</a></li>
+    <li><a href="#contact">Контакт</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div class="hero-left reveal">
+        <div class="hero-pill glass">Открыт к новым проектам</div>
+        <h1 class="hero-h1">
+          <span class="role">Unity<br>Developer</span>
+          <span class="sub">Games · Apps · Interactive</span>
+        </h1>
+        <p class="hero-desc">Создаю игры и приложения на Unity — от концепции до релиза. Фокус на отзывчивом геймплее, чистой архитектуре и удовольствии от игры.</p>
+        <div class="hero-cta">
+          <a href="#games" class="btn btn-solid">Посмотреть работы</a>
+          <a href="#contact" class="btn btn-glass glass">Связаться →</a>
+        </div>
+        <div class="hero-stats glass">
+          <div class="stat"><div class="stat-n" data-target="4">0</div><div class="stat-l">Игры</div></div>
+          <div class="stat"><div class="stat-n" data-target="3">0</div><div class="stat-l">Приложения</div></div>
+          <div class="stat"><div class="stat-n" data-target="3">0</div><div class="stat-l">Лет опыта</div></div>
+        </div>
+      </div>
+      <div class="hero-card glass reveal" style="transition-delay:.15s">
+        <div class="hero-avatar">🧑‍💻</div>
+        <!-- Замените на: <div class="hero-avatar"><img src="photo.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div> -->
+        <div class="hero-card-name">Ваше Имя</div>
+        <div class="hero-card-role">Unity · C# · Mobile</div>
+        <div class="hero-card-tags">
+          <span class="hctag">Unity3D</span><span class="hctag">C#</span><span class="hctag">ARKit</span>
+          <span class="hctag">Shader</span><span class="hctag">DOTS</span><span class="hctag">iOS</span>
+        </div>
+        <div class="avail">Available for work</div>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="reveal"><span class="sec-label">Стек</span></div>
+    <h2 class="sec-title reveal">Технологии</h2>
+    <div class="skills-grid">
+      <div class="skill-card glass reveal">
+        <div class="sk-icon">🎮</div><div class="sk-name">Unity3D</div>
+        <div class="sk-desc">Разработка игр и интерактивных приложений для мобильных, PC и WebGL платформ.</div>
+        <div class="sk-tags"><span class="sk-tag">C#</span><span class="sk-tag">Physics</span><span class="sk-tag">Animation</span><span class="sk-tag">UI Toolkit</span></div>
+      </div>
+      <div class="skill-card glass reveal" style="transition-delay:.08s">
+        <div class="sk-icon">📱</div><div class="sk-name">Mobile Dev</div>
+        <div class="sk-desc">iOS и Android с нативными интеграциями и оптимизацией под слабые устройства.</div>
+        <div class="sk-tags"><span class="sk-tag">Android</span><span class="sk-tag">iOS</span><span class="sk-tag">ARCore</span><span class="sk-tag">ARKit</span></div>
+      </div>
+      <div class="skill-card glass reveal" style="transition-delay:.16s">
+        <div class="sk-icon">⚡</div><div class="sk-name">Оптимизация</div>
+        <div class="sk-desc">Профилирование, ECS/DOTS, LOD, батчинг — стабильные 60fps на любых платформах.</div>
+        <div class="sk-tags"><span class="sk-tag">ECS</span><span class="sk-tag">DOTS</span><span class="sk-tag">Profiler</span><span class="sk-tag">LOD</span></div>
+      </div>
+      <div class="skill-card glass reveal" style="transition-delay:.24s">
+        <div class="sk-icon">✦</div><div class="sk-name">Шейдеры & VFX</div>
+        <div class="sk-desc">Shader Graph, HLSL, VFX Graph — кастомные визуальные эффекты под любой стиль.</div>
+        <div class="sk-tags"><span class="sk-tag">Shader Graph</span><span class="sk-tag">VFX Graph</span><span class="sk-tag">HLSL</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GAMES -->
+<section id="games">
+  <div class="wrap">
+    <div class="reveal"><span class="sec-label">Игры</span></div>
+    <h2 class="sec-title reveal">Мои <span>игры</span></h2>
+    <div class="works-grid">
+
+      <div class="work-card glass reveal">
+        <div class="work-thumb">🎮
+          <!-- <img src="screenshots/game1.png" alt="Игра 1"> -->
+          <span class="work-badge badge-game">Игра</span>
+          <div class="work-links"><a href="#" class="wlnk primary">Google Play</a><a href="#" class="wlnk">GitHub</a></div>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 1</div>
+          <div class="work-desc">Описание механик, жанра и особенностей. Что делает игру уникальной среди конкурентов.</div>
+          <div class="work-tech"><span class="ttag">Unity 2022</span><span class="ttag">C#</span><span class="ttag">Mobile</span></div>
+        </div>
+      </div>
+
+      <div class="work-card glass reveal" style="transition-delay:.08s">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(60,10,120,.5),rgba(10,80,200,.3))">🕹️
+          <span class="work-badge badge-game">Игра</span>
+          <div class="work-links"><a href="#" class="wlnk primary">Играть</a><a href="#" class="wlnk">Трейлер</a></div>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 2</div>
+          <div class="work-desc">Жанр, основные механики, целевая платформа и ключевые технические решения.</div>
+          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">2D</span><span class="ttag">Physics</span></div>
+        </div>
+      </div>
+
+      <div class="work-card glass reveal" style="transition-delay:.16s">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(10,100,80,.4),rgba(20,40,140,.4))">👾
+          <span class="work-badge badge-game">Игра</span>
+          <div class="work-links"><a href="#" class="wlnk primary">Скачать</a><a href="#" class="wlnk">App Store</a></div>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 3</div>
+          <div class="work-desc">Рейтинг, количество скачиваний, интересные факты о разработке.</div>
+          <div class="work-tech"><span class="ttag">Unity 3D</span><span class="ttag">Shader</span><span class="ttag">PC</span></div>
+        </div>
+      </div>
+
+      <div class="work-card glass reveal" style="transition-delay:.24s">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(80,10,80,.5),rgba(30,10,120,.4))">🚀
+          <span class="work-badge badge-game">Игра</span>
+          <div class="work-links"><a href="#" class="wlnk primary">Играть</a><a href="#" class="wlnk">Подробнее</a></div>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 4</div>
+          <div class="work-desc">Платформы, жанр, особые фичи — AR, мультиплеер, процедурная генерация.</div>
+          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">AR</span><span class="ttag">Mobile</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- APPS -->
+<section id="apps">
+  <div class="wrap">
+    <div class="reveal"><span class="sec-label">Приложения</span></div>
+    <h2 class="sec-title reveal">Мои <span>приложения</span></h2>
+    <div class="works-grid">
+
+      <div class="work-card glass reveal">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(0,80,180,.4),rgba(0,160,200,.25))">📐
+          <span class="work-badge badge-app">Приложение</span>
+          <div class="work-links"><a href="#" class="wlnk primary">App Store</a><a href="#" class="wlnk">Google Play</a></div>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ПРИЛОЖЕНИЯ 1</div>
+          <div class="work-desc">Какую задачу решает, целевая аудитория и ключевые функции приложения.</div>
+          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">ARKit</span><span class="ttag">iOS</span></div>
+        </div>
+      </div>
+
+      <div class="work-card glass reveal" style="transition-delay:.08s">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(0,120,100,.3),rgba(0,80,180,.35))">🔬
+          <span class="work-badge badge-app">Приложение</span>
+          <div class="work-links"><a href="#" class="wlnk primary">Скачать</a><a href="#" class="wlnk">Demo</a></div>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ПРИЛОЖЕНИЯ 2</div>
+          <div class="work-desc">Особые технические решения, интеграции с внешними API и аналитика.</div>
+          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">REST API</span><span class="ttag">Android</span></div>
+        </div>
+      </div>
+
+      <div class="work-card glass reveal" style="transition-delay:.16s">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(60,0,120,.4),rgba(0,100,180,.35))">🌐
+          <span class="work-badge badge-app">Приложение</span>
+          <div class="work-links"><a href="#" class="wlnk primary">Открыть</a><a href="#" class="wlnk">GitHub</a></div>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ПРИЛОЖЕНИЯ 3</div>
+          <div class="work-desc">Метрики использования, достижения проекта, отзывы пользователей.</div>
+          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">WebGL</span><span class="ttag">Cross-platform</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="reveal"><span class="sec-label">Обо мне</span></div>
+    <h2 class="sec-title reveal">Кто <span>я</span></h2>
+    <div class="about-grid">
+      <div class="about-text-card glass reveal">
+        <p>Привет! Меня зовут <strong>Ваше Имя</strong> — разработчик игр и мобильных приложений на Unity. Создаю цифровые продукты с [X] лет, специализируясь на мобильных платформах.</p>
+        <p>Фокусируюсь на <strong>чистой архитектуре кода</strong>, производительности и том ощущении отзывчивости, которое отличает хорошую игру от отличной.</p>
+        <p>Открыт к <strong>фрилансу и интересным проектам</strong>. Если у вас есть идея — давайте обсудим.</p>
+        <a href="resume.pdf" class="btn btn-glass glass">Скачать резюме</a>
+      </div>
+      <div class="about-code glass reveal" style="transition-delay:.12s">
+        <div class="cl"><span class="ln">1</span><span class="cm">// who am I?</span></div>
+        <div class="cl"><span class="ln">2</span></div>
+        <div class="cl"><span class="ln">3</span><span class="kw">public class</span>&nbsp;<span class="ty">Developer</span>&nbsp;:&nbsp;<span class="ty">MonoBehaviour</span>&nbsp;{</div>
+        <div class="cl"><span class="ln">4</span></div>
+        <div class="cl"><span class="ln">5</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">string</span> name&nbsp;=&nbsp;<span class="st">"Ваше Имя"</span>;</div>
+        <div class="cl"><span class="ln">6</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">int</span> yearsExp&nbsp;=&nbsp;<span class="st">3</span>;</div>
+        <div class="cl"><span class="ln">7</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">string</span> focus&nbsp;=&nbsp;<span class="st">"Mobile Games"</span>;</div>
+        <div class="cl"><span class="ln">8</span></div>
+        <div class="cl"><span class="ln">9</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">string[]</span> skills&nbsp;= {</div>
+        <div class="cl"><span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">"Unity3D"</span>, <span class="st">"C#"</span>, <span class="st">"AR/VR"</span>,</div>
+        <div class="cl"><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">"Shaders"</span>, <span class="st">"DOTS"</span>, <span class="st">"iOS"</span></div>
+        <div class="cl"><span class="ln">12</span>&nbsp;&nbsp;};</div>
+        <div class="cl"><span class="ln">13</span></div>
+        <div class="cl"><span class="ln">14</span>&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="fn">Start</span>() {</div>
+        <div class="cl"><span class="ln">15</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">BuildAwesomeThings</span>();</div>
+        <div class="cl"><span class="ln">16</span>&nbsp;&nbsp;}</div>
+        <div class="cl"><span class="ln">17</span>}</div>
+        <div class="cl"><span class="ln">18</span><span class="cb"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap" style="display:flex;justify-content:center">
+    <div class="contact-pill glass reveal">
+      <div class="contact-h">Начнём проект?</div>
+      <p class="contact-sub">Открыт для фриланса, долгосрочного сотрудничества<br>и просто интересных разговоров.</p>
+      <div class="contact-links">
+        <a href="mailto:your@email.com" class="clnk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </a>
+        <a href="https://t.me/yourusername" class="clnk">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.29 13.599l-2.969-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.868.96z"/></svg>
+          Telegram
+        </a>
+        <a href="https://github.com/yourusername" class="clnk">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="https://linkedin.com/in/yourusername" class="clnk">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <span class="foot-copy">© 2025 <em>Ваше Имя</em>. Crafted in Unity spirit.</span>
+      <a href="#hero" class="foot-up">↑ Наверх</a>
+    </div>
+  </div>
+</footer>
 
 <script>
-    // Projects data: 3 games + 2 apps, with placeholder screenshots (replace with your own images)
-    const portfolio = [
-        { id: 1, title: "NEBULA ROGUE", category: "game", desc: "Космический roguelite с системой фрактальных улучшений, динамическими врагами и неоновой графикой.", tech: ["Unity 2022 LTS", "Shader Graph", "Addressables", "VFX Graph"], screenshot: "https://placehold.co/700x450/14222e/4affff?text=NEBULA+ROGUE+GAMEPLAY" },
-        { id: 2, title: "ECHOES OF THE VOID", category: "game", desc: "Атмосферный платформер-головоломка, где звук отражается от стен и открывает новые пути.", tech: ["Cinemachine", "Post-processing", "Audio Mixer", "Tilemap"], screenshot: "https://placehold.co/700x450/1a2a36/6efff0?text=Echoes+of+the+Void+Art" },
-        { id: 3, title: "CYBER DRIFT NEO", category: "game", desc: "Гоночный экшен на антигравитации, разрушаемое окружение, кибер-панк эстетика.", tech: ["Unity Physics", "Trail FX", "Odin Inspector", "UI Toolkit"], screenshot: "https://placehold.co/700x450/0e1c2c/0ff?text=Cyber+Drift+Neo+Speed" },
-        { id: 4, title: "TASKFLOW GLASS", category: "app", desc: "Кроссплатформенный менеджер задач с живыми виджетами, аналитикой и синхронизацией.", tech: ["Firebase Firestore", "SQLite", "Unity UI Toolkit", "Native Plugins"], screenshot: "https://placehold.co/700x450/0f192b/8effff?text=TaskFlow+Glass+Interface" },
-        { id: 5, title: "HEALTH AURA", category: "app", desc: "Фитнес-трекер с метриками сна, калорий и интеграцией с Wear OS, красивая визуализация.", tech: ["Google Fit API", "MPAndroidChart", "REST", "JWT"], screenshot: "https://placehold.co/700x450/111d2f/c0e0ff?text=Health+Aura+Mobile" }
-    ];
+/* CURSOR */
+const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function loop(){
+  rx+=(mx-rx)*.16;ry+=(my-ry)*.16;
+  dot.style.left=mx+'px';dot.style.top=my+'px';
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,.work-card,.skill-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
+});
 
-    const grid = document.getElementById('projectsGrid');
-    const modal = document.getElementById('screenshotModal');
-    const modalImage = document.getElementById('modalImgSrc');
+/* SCROLL */
+const prog=document.getElementById('progress'),nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+  prog.style.width=(scrollY/(document.body.scrollHeight-innerHeight)*100)+'%';
+  nav.classList.toggle('scrolled',scrollY>40);
+});
 
-    function renderProjects(filter = 'all') {
-        let filtered = portfolio;
-        if (filter === 'game') filtered = portfolio.filter(p => p.category === 'game');
-        if (filter === 'app') filtered = portfolio.filter(p => p.category === 'app');
-        
-        grid.innerHTML = filtered.map(proj => `
-            <div class="project-liquid" data-id="${proj.id}" data-category="${proj.category}">
-                <div class="project-img" style="background-image: url('${proj.screenshot}'); background-size: cover; background-position: center;"></div>
-                <div class="project-info">
-                    <div class="project-tag">${proj.category === 'game' ? '✦ ИГРА ✦' : '✦ ПРИЛОЖЕНИЕ ✦'}</div>
-                    <div class="project-title">${proj.title}</div>
-                    <div class="project-desc">${proj.desc}</div>
-                    <div class="tech-stack">
-                        ${proj.tech.map(t => `<span class="tech-badge-glass">${t}</span>`).join('')}
-                    </div>
-                </div>
-            </div>
-        `).join('');
+/* REVEAL */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*60);});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-        // Attach click event for modal on each new card
-        document.querySelectorAll('.project-liquid').forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = parseInt(card.getAttribute('data-id'));
-                const project = portfolio.find(p => p.id === id);
-                if (project) {
-                    modalImage.src = project.screenshot;
-                    modal.classList.add('active');
-                }
-            });
-        });
-    }
+/* COUNTERS */
+const cio=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const t=+e.target.dataset.target,s=Date.now();
+    const tick=()=>{const p=Math.min(1,(Date.now()-s)/900);e.target.textContent=Math.round(p*t);p<1&&requestAnimationFrame(tick);};
+    tick();cio.unobserve(e.target);
+  });
+},{threshold:.5});
+document.querySelectorAll('[data-target]').forEach(el=>cio.observe(el));
 
-    // Filter logic
-    const filterChips = document.querySelectorAll('.filter-chip');
-    filterChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            filterChips.forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            const filterValue = chip.getAttribute('data-filter');
-            renderProjects(filterValue);
-        });
-    });
+/* BLOB PARALLAX */
+const blobs=[...document.querySelectorAll('.blob')];
+document.addEventListener('mousemove',e=>{
+  const nx=(e.clientX/innerWidth-.5)*2,ny=(e.clientY/innerHeight-.5)*2;
+  blobs.forEach((b,i)=>{const f=[18,14,22,10][i];b.style.transform=`translate(${nx*f}px,${ny*f}px)`;});
+});
 
-    // Close modal on click
-    modal.addEventListener('click', () => {
-        modal.classList.remove('active');
-        modalImage.src = '';
-    });
+/* CARD TILT */
+document.querySelectorAll('.work-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=`translateY(-10px) rotateY(${x*8}deg) rotateX(${-y*5}deg)`;
+  });
+  card.addEventListener('mouseleave',()=>card.style.transform='');
+});
 
-    // Scroll to top button
-    const scrollBtn = document.getElementById('scrollTopBtn');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 400) scrollBtn.classList.add('visible');
-        else scrollBtn.classList.remove('visible');
-    });
-    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-    // Smooth anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const targetId = this.getAttribute('href');
-            if (targetId === "#" || targetId === "") return;
-            const targetEl = document.querySelector(targetId);
-            if (targetEl) {
-                e.preventDefault();
-                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    });
-
-    // Fade-in animation on scroll for glass cards
-    const fadeElements = document.querySelectorAll('.project-liquid, .skill-block, .contact-glass');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1, rootMargin: "0px 0px -30px 0px" });
-    fadeElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(18px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.5s ease';
-        observer.observe(el);
-    });
-    
-    // initial render
-    renderProjects('all');
-
-    // tiny extra glassmorphic effect on hover for buttons 
-    console.log("✨ Liquid Glass portfolio ready — replace placeholders with real game/app screenshots!");
+/* SMOOTH SCROLL */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  });
+});
 </script>
 </body>
 </html>
