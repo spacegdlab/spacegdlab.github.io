@@ -81,6 +81,19 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overf
   display: flex; flex-direction: column; align-items: center;
 }
 
+/* canvas behind logo — must fill the full section */
+#logo-canvas{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+  display: block;
+}
+
+.logo-wrap{
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+}
+
 /* orbital ring decoration */
 .logo-orbit{
   position: absolute;
@@ -117,7 +130,7 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overf
 }
 .logo-mark svg{ width:38px; height:38px; }
 
-/* wordmark */
+/* wordmark — fix: gradient on the wrapper, not nested spans */
 #logo-wordmark{
   font-family: 'Syne', sans-serif;
   font-weight: 800;
@@ -126,16 +139,15 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overf
   line-height: 1;
   margin-bottom: 16px;
   position: relative;
-  /* clip each letter individually via spans */
+  color: #fff; /* fallback so text is always visible */
 }
-.wm-space{
-  background: linear-gradient(120deg, #fff 0%, rgba(255,255,255,.9) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* "Space" part — plain white */
+.wm-space{ color: #fff; }
+/* "Lab" part — ice-blue gradient */
 .wm-lab{
-  background: linear-gradient(120deg, var(--ice) 0%, #7eb8ff 50%, rgba(140,100,255,.9) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background: linear-gradient(120deg, var(--ice) 0%, #7eb8ff 45%, #b08fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   background-clip: text;
   background-size: 200%; background-position: 0%;
   animation: lab-shift 6s ease-in-out infinite alternate;
@@ -143,6 +155,20 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overf
 @keyframes lab-shift{
   0%  { background-position: 0%; }
   100%{ background-position: 100%; }
+}
+
+/* individual letters for parallax — must not break gradient on .wm-lab */
+.wm-letter{
+  display: inline-block;
+  transition: transform .4s cubic-bezier(.22,1,.36,1);
+  will-change: transform;
+}
+/* keep gradient visible on lab letters */
+.wm-lab .wm-letter{
+  background: inherit;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .logo-tagline{
@@ -157,19 +183,12 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overf
 .logo-scroll{
   position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  opacity: .4; animation: scroll-fade 2s ease-in-out infinite;
+  animation: scroll-fade 2s ease-in-out infinite;
+  pointer-events: none;
 }
-@keyframes scroll-fade{ 0%,100%{opacity:.25; transform:translateX(-50%) translateY(0)} 50%{opacity:.55; transform:translateX(-50%) translateY(6px)} }
+@keyframes scroll-fade{ 0%,100%{opacity:.25; transform:translateX(-50%) translateY(0)} 50%{opacity:.5; transform:translateX(-50%) translateY(6px)} }
 .logo-scroll span{ font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--t3); }
 .scroll-line{ width:1px; height:36px; background:linear-gradient(180deg,var(--t3),transparent); }
-
-/* interactive: letter float on mousemove handled in JS */
-.wm-letter{
-  display: inline-block;
-  transition: transform .4s cubic-bezier(.22,1,.36,1), filter .4s;
-  will-change: transform;
-}
-#logo-wordmark:hover .wm-letter{ filter: brightness(1.15); }
 
 /* LAYOUT */
 .wrap{max-width:1160px;margin:0 auto;padding:0 32px;position:relative;z-index:3}
