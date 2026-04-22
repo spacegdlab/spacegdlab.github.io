@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YOUR NAME — Unity Developer</title>
+<title>SpaceLab — Unity Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 <style>
@@ -25,11 +25,15 @@
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
 
-/* CURSOR */
+/* CURSOR — скрываем на мобильных */
 #cur-dot{position:fixed;width:8px;height:8px;background:#fff;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .2s,height .2s}
 #cur-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(255,255,255,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s;backdrop-filter:blur(2px)}
 .cursor-hover #cur-dot{width:14px;height:14px;background:var(--ice)}
 .cursor-hover #cur-ring{width:52px;height:52px;border-color:rgba(174,232,255,.7)}
+@media(hover:none),(pointer:coarse){
+  body{cursor:auto}
+  #cur-dot,#cur-ring{display:none!important}
+}
 
 /* BLOBS */
 #blob-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
@@ -55,20 +59,123 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overf
 /* SCROLL BAR */
 #progress{position:fixed;top:0;left:0;height:1.5px;z-index:200;background:linear-gradient(90deg,rgba(174,232,255,0),var(--ice),rgba(100,180,255,.8));width:0;transition:width .12s linear}
 
-/* NAV */
-nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:100px;transition:box-shadow .4s}
-nav.scrolled{box-shadow:0 8px 48px rgba(0,0,0,.6),0 0 0 .5px rgba(255,255,255,.08)}
-.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:var(--t1);text-decoration:none;padding:4px 16px;white-space:nowrap;letter-spacing:-.01em}
-.nav-logo em{font-style:normal;color:var(--ice)}
-.ndiv{width:1px;height:20px;background:var(--glass-bo)}
-.nav-links{display:flex;gap:2px;list-style:none}
-.nav-links a{display:block;padding:7px 14px;font-size:.78rem;font-weight:500;color:var(--t2);text-decoration:none;border-radius:100px;transition:color .2s,background .2s}
-.nav-links a:hover{color:var(--t1);background:rgba(255,255,255,.07)}
+/* ── SPACELAB LOGO HERO ──────────────────────────────── */
+#logo-hero{
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative; z-index: 3;
+  padding: 60px 32px 80px;
+  text-align: center;
+  gap: 0;
+}
+
+/* canvas behind logo */
+#logo-canvas{
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+}
+
+.logo-wrap{
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* orbital ring decoration */
+.logo-orbit{
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(174,232,255,.1);
+  pointer-events: none;
+}
+.lo1{ width:340px; height:340px; top:50%; left:50%; transform:translate(-50%,-50%) rotate(0deg);
+  animation: orbit-spin 18s linear infinite; }
+.lo2{ width:500px; height:500px; top:50%; left:50%; transform:translate(-50%,-50%) rotate(20deg);
+  border-color: rgba(100,80,255,.08);
+  animation: orbit-spin 28s linear infinite reverse; }
+.lo1::after, .lo2::after{
+  content:''; position:absolute; width:6px; height:6px; border-radius:50%;
+  background: var(--ice); top:-3px; left:50%; transform:translateX(-50%);
+  box-shadow: 0 0 12px var(--ice);
+}
+.lo2::after{ background: rgba(140,100,255,.9); box-shadow: 0 0 12px #8c64ff; }
+@keyframes orbit-spin{ to{ transform:translate(-50%,-50%) rotate(360deg); } }
+
+/* logo mark — the "S" planet icon */
+.logo-mark{
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(60,100,255,.4), rgba(0,200,255,.25));
+  border: 1px solid rgba(174,232,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 28px; position: relative;
+  box-shadow: 0 0 60px rgba(100,160,255,.25), inset 0 1px 0 rgba(255,255,255,.2);
+  animation: mark-glow 4s ease-in-out infinite;
+}
+@keyframes mark-glow{
+  0%,100%{ box-shadow: 0 0 40px rgba(100,160,255,.2), inset 0 1px 0 rgba(255,255,255,.18); }
+  50%{     box-shadow: 0 0 80px rgba(100,160,255,.45), inset 0 1px 0 rgba(255,255,255,.25); }
+}
+.logo-mark svg{ width:38px; height:38px; }
+
+/* wordmark */
+#logo-wordmark{
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(4rem, 12vw, 9rem);
+  letter-spacing: -.04em;
+  line-height: 1;
+  margin-bottom: 16px;
+  position: relative;
+  /* clip each letter individually via spans */
+}
+.wm-space{
+  background: linear-gradient(120deg, #fff 0%, rgba(255,255,255,.9) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.wm-lab{
+  background: linear-gradient(120deg, var(--ice) 0%, #7eb8ff 50%, rgba(140,100,255,.9) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200%; background-position: 0%;
+  animation: lab-shift 6s ease-in-out infinite alternate;
+}
+@keyframes lab-shift{
+  0%  { background-position: 0%; }
+  100%{ background-position: 100%; }
+}
+
+.logo-tagline{
+  font-size: clamp(.8rem, 2vw, 1rem);
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 48px;
+}
+
+/* scroll hint */
+.logo-scroll{
+  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  opacity: .4; animation: scroll-fade 2s ease-in-out infinite;
+}
+@keyframes scroll-fade{ 0%,100%{opacity:.25; transform:translateX(-50%) translateY(0)} 50%{opacity:.55; transform:translateX(-50%) translateY(6px)} }
+.logo-scroll span{ font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--t3); }
+.scroll-line{ width:1px; height:36px; background:linear-gradient(180deg,var(--t3),transparent); }
+
+/* interactive: letter float on mousemove handled in JS */
+.wm-letter{
+  display: inline-block;
+  transition: transform .4s cubic-bezier(.22,1,.36,1), filter .4s;
+  will-change: transform;
+}
+#logo-wordmark:hover .wm-letter{ filter: brightness(1.15); }
 
 /* LAYOUT */
 .wrap{max-width:1160px;margin:0 auto;padding:0 32px;position:relative;z-index:3}
-section{padding:140px 0 0}
+section{padding:120px 0 0}
 section:last-of-type{padding-bottom:140px}
+#logo-hero{padding:0}
 
 /* REVEAL */
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
@@ -185,12 +292,178 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
 .foot-up{font-size:.72rem;color:var(--t3);text-decoration:none;letter-spacing:.08em;cursor:none;transition:color .2s}
 .foot-up:hover{color:var(--t1)}
 
+/* ── MODAL ──────────────────────────────────────────────────── */
+#modal-backdrop{
+  position:fixed;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:rgba(9,9,15,0);
+  backdrop-filter:blur(0px);
+  -webkit-backdrop-filter:blur(0px);
+  pointer-events:none;
+  transition:background .35s ease, backdrop-filter .35s ease;
+}
+#modal-backdrop.open{
+  background:rgba(9,9,15,.72);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  pointer-events:all;
+}
+#modal{
+  width:100%;max-width:860px;max-height:90vh;
+  border-radius:32px;overflow:hidden;
+  display:flex;flex-direction:column;
+  background:rgba(255,255,255,0.07);
+  backdrop-filter:blur(40px) saturate(180%) brightness(1.12);
+  -webkit-backdrop-filter:blur(40px) saturate(180%) brightness(1.12);
+  border:1px solid rgba(255,255,255,0.16);
+  box-shadow:0 40px 120px rgba(0,0,0,.8), 0 0 0 .5px rgba(255,255,255,.08), inset 0 1px 0 rgba(255,255,255,.22);
+  opacity:0;transform:scale(.94) translateY(24px);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1), transform .38s cubic-bezier(.22,1,.36,1);
+  position:relative;
+}
+#modal-backdrop.open #modal{opacity:1;transform:none;}
+
+/* top shine on modal */
+#modal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6) 35%,rgba(255,255,255,.18) 65%,transparent);
+  z-index:10;pointer-events:none;
+}
+#modal::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:45%;
+  background:linear-gradient(180deg,rgba(255,255,255,.055) 0%,transparent 100%);
+  border-radius:32px 32px 0 0;pointer-events:none;z-index:1;
+}
+
+/* gallery */
+#modal-gallery{
+  width:100%;aspect-ratio:16/9;flex-shrink:0;
+  background:#0d0d1a;position:relative;overflow:hidden;
+}
+#modal-gallery-track{
+  display:flex;height:100%;
+  transition:transform .45s cubic-bezier(.22,1,.36,1);
+}
+.modal-slide{
+  flex:0 0 100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:6rem;
+  position:relative;
+}
+.modal-slide img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:1}
+
+/* ── HALF-CLICK ZONES (left/right halves of the image) ── */
+.gal-zone{
+  position:absolute;top:0;bottom:0;width:50%;z-index:6;
+  cursor:none;display:flex;align-items:center;
+}
+#gal-zone-prev{left:0;justify-content:flex-start;padding-left:20px}
+#gal-zone-next{right:0;justify-content:flex-end;padding-right:20px}
+
+.gal-zone-hint{
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.3rem;font-weight:300;line-height:1;
+  opacity:0;transform:scale(.75) translateX(0);
+  transition:opacity .22s ease, transform .22s cubic-bezier(.22,1,.36,1);
+  pointer-events:none;
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
+  user-select:none;
+}
+#gal-zone-prev .gal-zone-hint{ transform:scale(.75) translateX(-6px); }
+#gal-zone-next .gal-zone-hint{ transform:scale(.75) translateX(6px); }
+.gal-zone:hover .gal-zone-hint{ opacity:1; transform:scale(1) translateX(0); }
+.gal-zone.hidden{ display:none; }
+
+/* ── DOTS ── */
+#gal-dots{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;gap:7px;z-index:7;
+}
+.gal-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  transition:background .25s, width .25s, border-radius .25s;
+  cursor:none;
+}
+.gal-dot.active{background:#fff;width:20px;border-radius:3px}
+@media(hover:none),(pointer:coarse){
+  .gal-dot{cursor:pointer}
+}
+
+/* ── AURORA BACKGROUND inside gallery ── */
+#modal-aurora{
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.au{position:absolute;border-radius:50%;filter:blur(64px);opacity:.9;will-change:transform}
+.au1{width:420px;height:420px;background:radial-gradient(circle,rgba(60,100,255,.55) 0%,transparent 70%);
+  top:-120px;left:-120px;animation:au1 13s ease-in-out infinite}
+.au2{width:360px;height:360px;background:radial-gradient(circle,rgba(0,190,255,.45) 0%,transparent 70%);
+  bottom:-90px;right:-90px;animation:au2 11s ease-in-out infinite}
+.au3{width:260px;height:260px;background:radial-gradient(circle,rgba(130,50,255,.4) 0%,transparent 70%);
+  top:30%;left:35%;animation:au3 15s ease-in-out infinite}
+@keyframes au1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(70px,50px) scale(1.18)}}
+@keyframes au2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-60px,-70px) scale(1.12)}}
+@keyframes au3{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,-40px) scale(.88)}66%{transform:translate(-50px,40px) scale(1.14)}}
+
+/* modal body */
+#modal-body{
+  padding:32px 36px 36px;overflow-y:auto;flex:1;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
+}
+#modal-body::-webkit-scrollbar{width:4px}
+#modal-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+
+#modal-close{
+  position:absolute;top:16px;right:16px;z-index:20;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  cursor:none;color:rgba(255,255,255,.7);font-size:1rem;
+  transition:background .2s,color .2s;
+}
+#modal-close:hover{background:rgba(255,255,255,.22);color:#fff}
+
+.modal-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:100px;
+  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+  margin-bottom:16px;
+}
+#modal-title{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:1.8rem;letter-spacing:-.03em;margin-bottom:12px;color:var(--t1);
+}
+#modal-desc{font-size:.9rem;color:var(--t2);line-height:1.8;margin-bottom:24px}
+
+.modal-meta{
+  display:flex;flex-wrap:wrap;gap:32px;
+  padding:20px 0;border-top:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  margin-bottom:24px;
+}
+.meta-item{}
+.meta-label{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.meta-val{font-size:.85rem;color:var(--t1);font-weight:500}
+
+#modal-tech{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+
+#modal-actions{display:flex;gap:10px;flex-wrap:wrap}
+
 @media(max-width:860px){
   .hero-inner{grid-template-columns:1fr}
   .hero-card{width:100%;max-width:320px}
   .about-grid{grid-template-columns:1fr}
   .wrap{padding:0 20px}
   nav .nav-links,.ndiv{display:none}
+  #modal-body{padding:24px 20px 28px}
+  #modal-title{font-size:1.4rem}
+  .modal-meta{gap:20px}
 }
 </style>
 </head>
@@ -207,141 +480,51 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
 <div id="noise"></div>
 
 <!-- NAV -->
-<nav class="glass" id="nav">
-  <a href="#hero" class="nav-logo">YOUR<em>.</em>NAME</a>
-  <div class="ndiv"></div>
-  <ul class="nav-links">
-    <li><a href="#skills">Навыки</a></li>
-    <li><a href="#games">Игры</a></li>
-    <li><a href="#apps">Приложения</a></li>
-    <li><a href="#about">Обо мне</a></li>
-    <li><a href="#contact">Контакт</a></li>
-  </ul>
-</nav>
+<!-- ══════════ SPACELAB LOGO HERO ══════════ -->
+<section id="logo-hero">
+  <canvas id="logo-canvas"></canvas>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="wrap">
-    <div class="hero-inner">
-      <div class="hero-left reveal">
-        <div class="hero-pill glass">Открыт к новым проектам</div>
-        <h1 class="hero-h1">
-          <span class="role">Unity<br>Developer</span>
-          <span class="sub">Games · Apps · Interactive</span>
-        </h1>
-        <p class="hero-desc">Создаю игры и приложения на Unity — от концепции до релиза. Фокус на отзывчивом геймплее, чистой архитектуре и удовольствии от игры.</p>
-        <div class="hero-cta">
-          <a href="#games" class="btn btn-solid">Посмотреть работы</a>
-          <a href="#contact" class="btn btn-glass glass">Связаться →</a>
-        </div>
-        <div class="hero-stats glass">
-          <div class="stat"><div class="stat-n" data-target="4">0</div><div class="stat-l">Игры</div></div>
-          <div class="stat"><div class="stat-n" data-target="3">0</div><div class="stat-l">Приложения</div></div>
-          <div class="stat"><div class="stat-n" data-target="3">0</div><div class="stat-l">Лет опыта</div></div>
-        </div>
-      </div>
-      <div class="hero-card glass reveal" style="transition-delay:.15s">
-        <div class="hero-avatar">🧑‍💻</div>
-        <!-- Замените на: <div class="hero-avatar"><img src="photo.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div> -->
-        <div class="hero-card-name">Ваше Имя</div>
-        <div class="hero-card-role">Unity · C# · Mobile</div>
-        <div class="hero-card-tags">
-          <span class="hctag">Unity3D</span><span class="hctag">C#</span><span class="hctag">ARKit</span>
-          <span class="hctag">Shader</span><span class="hctag">DOTS</span><span class="hctag">iOS</span>
-        </div>
-        <div class="avail">Available for work</div>
-      </div>
+  <div class="logo-wrap reveal">
+    <!-- orbital rings -->
+    <div class="logo-orbit lo1"></div>
+    <div class="logo-orbit lo2"></div>
+
+    <!-- planet mark -->
+    <div class="logo-mark">
+      <svg viewBox="0 0 38 38" fill="none">
+        <!-- planet body -->
+        <circle cx="19" cy="19" r="13" fill="url(#pg)" opacity=".9"/>
+        <!-- ring -->
+        <ellipse cx="19" cy="19" rx="18" ry="6" stroke="rgba(174,232,255,.55)" stroke-width="1.2" fill="none" transform="rotate(-20 19 19)"/>
+        <defs>
+          <radialGradient id="pg" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#aee8ff"/>
+            <stop offset="100%" stop-color="#3060ff"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- wordmark -->
+    <div id="logo-wordmark">
+      <span class="wm-space">
+        <span class="wm-letter">S</span><span class="wm-letter">p</span><span class="wm-letter">a</span><span class="wm-letter">c</span><span class="wm-letter">e</span>
+      </span><span class="wm-lab">
+        <span class="wm-letter">L</span><span class="wm-letter">a</span><span class="wm-letter">b</span>
+      </span>
+    </div>
+
+    <div class="logo-tagline">Unity Games &amp; Apps Studio</div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <a href="#apps" class="btn btn-solid">Наши работы</a>
+      <a href="#contact" class="btn btn-glass glass">Связаться →</a>
     </div>
   </div>
-</section>
 
-<!-- SKILLS -->
-<section id="skills">
-  <div class="wrap">
-    <div class="reveal"><span class="sec-label">Стек</span></div>
-    <h2 class="sec-title reveal">Технологии</h2>
-    <div class="skills-grid">
-      <div class="skill-card glass reveal">
-        <div class="sk-icon">🎮</div><div class="sk-name">Unity3D</div>
-        <div class="sk-desc">Разработка игр и интерактивных приложений для мобильных, PC и WebGL платформ.</div>
-        <div class="sk-tags"><span class="sk-tag">C#</span><span class="sk-tag">Physics</span><span class="sk-tag">Animation</span><span class="sk-tag">UI Toolkit</span></div>
-      </div>
-      <div class="skill-card glass reveal" style="transition-delay:.08s">
-        <div class="sk-icon">📱</div><div class="sk-name">Mobile Dev</div>
-        <div class="sk-desc">iOS и Android с нативными интеграциями и оптимизацией под слабые устройства.</div>
-        <div class="sk-tags"><span class="sk-tag">Android</span><span class="sk-tag">iOS</span><span class="sk-tag">ARCore</span><span class="sk-tag">ARKit</span></div>
-      </div>
-      <div class="skill-card glass reveal" style="transition-delay:.16s">
-        <div class="sk-icon">⚡</div><div class="sk-name">Оптимизация</div>
-        <div class="sk-desc">Профилирование, ECS/DOTS, LOD, батчинг — стабильные 60fps на любых платформах.</div>
-        <div class="sk-tags"><span class="sk-tag">ECS</span><span class="sk-tag">DOTS</span><span class="sk-tag">Profiler</span><span class="sk-tag">LOD</span></div>
-      </div>
-      <div class="skill-card glass reveal" style="transition-delay:.24s">
-        <div class="sk-icon">✦</div><div class="sk-name">Шейдеры & VFX</div>
-        <div class="sk-desc">Shader Graph, HLSL, VFX Graph — кастомные визуальные эффекты под любой стиль.</div>
-        <div class="sk-tags"><span class="sk-tag">Shader Graph</span><span class="sk-tag">VFX Graph</span><span class="sk-tag">HLSL</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- GAMES -->
-<section id="games">
-  <div class="wrap">
-    <div class="reveal"><span class="sec-label">Игры</span></div>
-    <h2 class="sec-title reveal">Мои <span>игры</span></h2>
-    <div class="works-grid">
-
-      <div class="work-card glass reveal">
-        <div class="work-thumb">🎮
-          <!-- <img src="screenshots/game1.png" alt="Игра 1"> -->
-          <span class="work-badge badge-game">Игра</span>
-          <div class="work-links"><a href="#" class="wlnk primary">Google Play</a><a href="#" class="wlnk">GitHub</a></div>
-        </div>
-        <div class="work-body">
-          <div class="work-title">НАЗВАНИЕ ИГРЫ 1</div>
-          <div class="work-desc">Описание механик, жанра и особенностей. Что делает игру уникальной среди конкурентов.</div>
-          <div class="work-tech"><span class="ttag">Unity 2022</span><span class="ttag">C#</span><span class="ttag">Mobile</span></div>
-        </div>
-      </div>
-
-      <div class="work-card glass reveal" style="transition-delay:.08s">
-        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(60,10,120,.5),rgba(10,80,200,.3))">🕹️
-          <span class="work-badge badge-game">Игра</span>
-          <div class="work-links"><a href="#" class="wlnk primary">Играть</a><a href="#" class="wlnk">Трейлер</a></div>
-        </div>
-        <div class="work-body">
-          <div class="work-title">НАЗВАНИЕ ИГРЫ 2</div>
-          <div class="work-desc">Жанр, основные механики, целевая платформа и ключевые технические решения.</div>
-          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">2D</span><span class="ttag">Physics</span></div>
-        </div>
-      </div>
-
-      <div class="work-card glass reveal" style="transition-delay:.16s">
-        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(10,100,80,.4),rgba(20,40,140,.4))">👾
-          <span class="work-badge badge-game">Игра</span>
-          <div class="work-links"><a href="#" class="wlnk primary">Скачать</a><a href="#" class="wlnk">App Store</a></div>
-        </div>
-        <div class="work-body">
-          <div class="work-title">НАЗВАНИЕ ИГРЫ 3</div>
-          <div class="work-desc">Рейтинг, количество скачиваний, интересные факты о разработке.</div>
-          <div class="work-tech"><span class="ttag">Unity 3D</span><span class="ttag">Shader</span><span class="ttag">PC</span></div>
-        </div>
-      </div>
-
-      <div class="work-card glass reveal" style="transition-delay:.24s">
-        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(80,10,80,.5),rgba(30,10,120,.4))">🚀
-          <span class="work-badge badge-game">Игра</span>
-          <div class="work-links"><a href="#" class="wlnk primary">Играть</a><a href="#" class="wlnk">Подробнее</a></div>
-        </div>
-        <div class="work-body">
-          <div class="work-title">НАЗВАНИЕ ИГРЫ 4</div>
-          <div class="work-desc">Платформы, жанр, особые фичи — AR, мультиплеер, процедурная генерация.</div>
-          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">AR</span><span class="ttag">Mobile</span></div>
-        </div>
-      </div>
-
-    </div>
+  <div class="logo-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
   </div>
 </section>
 
@@ -349,13 +532,22 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
 <section id="apps">
   <div class="wrap">
     <div class="reveal"><span class="sec-label">Приложения</span></div>
-    <h2 class="sec-title reveal">Мои <span>приложения</span></h2>
+    <h2 class="sec-title reveal">Наши <span>приложения</span></h2>
     <div class="works-grid">
 
-      <div class="work-card glass reveal">
+      <div class="work-card glass reveal" data-type="app"
+        data-title="НАЗВАНИЕ ПРИЛОЖЕНИЯ 1"
+        data-desc="Подробное описание приложения. Какую задачу решает, для кого создано. Опишите ключевые функции, уникальные технические решения и результаты — метрики, отзывы пользователей."
+        data-tech="Unity,C#,ARKit,iOS"
+        data-platform="iOS"
+        data-year="2024"
+        data-status="В App Store"
+        data-link1-label="App Store" data-link1-url="#"
+        data-link2-label="Google Play" data-link2-url="#"
+        data-slides="📐,🔬"
+        data-bg="linear-gradient(135deg,rgba(0,80,180,.4),rgba(0,160,200,.25))">
         <div class="work-thumb" style="background:linear-gradient(135deg,rgba(0,80,180,.4),rgba(0,160,200,.25))">📐
           <span class="work-badge badge-app">Приложение</span>
-          <div class="work-links"><a href="#" class="wlnk primary">App Store</a><a href="#" class="wlnk">Google Play</a></div>
         </div>
         <div class="work-body">
           <div class="work-title">НАЗВАНИЕ ПРИЛОЖЕНИЯ 1</div>
@@ -364,10 +556,19 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
         </div>
       </div>
 
-      <div class="work-card glass reveal" style="transition-delay:.08s">
+      <div class="work-card glass reveal" style="transition-delay:.08s" data-type="app"
+        data-title="НАЗВАНИЕ ПРИЛОЖЕНИЯ 2"
+        data-desc="Описание второго приложения. Особые технические решения — интеграции с внешними API, работа с данными, аналитика. Что сложнее всего было реализовать и как вы это решили."
+        data-tech="Unity,C#,REST API,Android"
+        data-platform="Android"
+        data-year="2023"
+        data-status="В Google Play"
+        data-link1-label="Скачать" data-link1-url="#"
+        data-link2-label="Demo" data-link2-url="#"
+        data-slides="🔬,🌐"
+        data-bg="linear-gradient(135deg,rgba(0,120,100,.3),rgba(0,80,180,.35))">
         <div class="work-thumb" style="background:linear-gradient(135deg,rgba(0,120,100,.3),rgba(0,80,180,.35))">🔬
           <span class="work-badge badge-app">Приложение</span>
-          <div class="work-links"><a href="#" class="wlnk primary">Скачать</a><a href="#" class="wlnk">Demo</a></div>
         </div>
         <div class="work-body">
           <div class="work-title">НАЗВАНИЕ ПРИЛОЖЕНИЯ 2</div>
@@ -376,10 +577,19 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
         </div>
       </div>
 
-      <div class="work-card glass reveal" style="transition-delay:.16s">
+      <div class="work-card glass reveal" style="transition-delay:.16s" data-type="app"
+        data-title="НАЗВАНИЕ ПРИЛОЖЕНИЯ 3"
+        data-desc="Описание третьего приложения. Метрики использования, достижения проекта. Укажите если проект получал признание, попадал в редакционные подборки или имеет значимую аудиторию."
+        data-tech="Unity,C#,WebGL,Cross-platform"
+        data-platform="Web / Cross-platform"
+        data-year="2022"
+        data-status="Активен"
+        data-link1-label="Открыть" data-link1-url="#"
+        data-link2-label="GitHub" data-link2-url="#"
+        data-slides="🌐,📐,🔬"
+        data-bg="linear-gradient(135deg,rgba(60,0,120,.4),rgba(0,100,180,.35))">
         <div class="work-thumb" style="background:linear-gradient(135deg,rgba(60,0,120,.4),rgba(0,100,180,.35))">🌐
           <span class="work-badge badge-app">Приложение</span>
-          <div class="work-links"><a href="#" class="wlnk primary">Открыть</a><a href="#" class="wlnk">GitHub</a></div>
         </div>
         <div class="work-body">
           <div class="work-title">НАЗВАНИЕ ПРИЛОЖЕНИЯ 3</div>
@@ -392,38 +602,97 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
   </div>
 </section>
 
-<!-- ABOUT -->
-<section id="about">
+<!-- GAMES -->
+<section id="games">
   <div class="wrap">
-    <div class="reveal"><span class="sec-label">Обо мне</span></div>
-    <h2 class="sec-title reveal">Кто <span>я</span></h2>
-    <div class="about-grid">
-      <div class="about-text-card glass reveal">
-        <p>Привет! Меня зовут <strong>Ваше Имя</strong> — разработчик игр и мобильных приложений на Unity. Создаю цифровые продукты с [X] лет, специализируясь на мобильных платформах.</p>
-        <p>Фокусируюсь на <strong>чистой архитектуре кода</strong>, производительности и том ощущении отзывчивости, которое отличает хорошую игру от отличной.</p>
-        <p>Открыт к <strong>фрилансу и интересным проектам</strong>. Если у вас есть идея — давайте обсудим.</p>
-        <a href="resume.pdf" class="btn btn-glass glass">Скачать резюме</a>
+    <div class="reveal"><span class="sec-label">Игры</span></div>
+    <h2 class="sec-title reveal">Наши <span>игры</span></h2>
+    <div class="works-grid">
+
+      <div class="work-card glass reveal" data-type="game"
+        data-title="НАЗВАНИЕ ИГРЫ 1"
+        data-desc="Подробное описание игры. Расскажите о механиках, жанре, на каких платформах доступна. Что делает её уникальной среди конкурентов и почему игроки возвращаются снова."
+        data-tech="Unity 2022,C#,Mobile,Physics"
+        data-platform="Android / iOS"
+        data-year="2024"
+        data-status="В релизе"
+        data-link1-label="Google Play" data-link1-url="#"
+        data-link2-label="GitHub" data-link2-url="#"
+        data-slides="🎮,🎮,🕹️"
+        data-bg="linear-gradient(135deg,rgba(20,40,120,.4),rgba(80,20,180,.3))">
+        <div class="work-thumb">🎮
+          <span class="work-badge badge-game">Игра</span>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 1</div>
+          <div class="work-desc">Описание механик, жанра и особенностей. Что делает игру уникальной среди конкурентов.</div>
+          <div class="work-tech"><span class="ttag">Unity 2022</span><span class="ttag">C#</span><span class="ttag">Mobile</span></div>
+        </div>
       </div>
-      <div class="about-code glass reveal" style="transition-delay:.12s">
-        <div class="cl"><span class="ln">1</span><span class="cm">// who am I?</span></div>
-        <div class="cl"><span class="ln">2</span></div>
-        <div class="cl"><span class="ln">3</span><span class="kw">public class</span>&nbsp;<span class="ty">Developer</span>&nbsp;:&nbsp;<span class="ty">MonoBehaviour</span>&nbsp;{</div>
-        <div class="cl"><span class="ln">4</span></div>
-        <div class="cl"><span class="ln">5</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">string</span> name&nbsp;=&nbsp;<span class="st">"Ваше Имя"</span>;</div>
-        <div class="cl"><span class="ln">6</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">int</span> yearsExp&nbsp;=&nbsp;<span class="st">3</span>;</div>
-        <div class="cl"><span class="ln">7</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">string</span> focus&nbsp;=&nbsp;<span class="st">"Mobile Games"</span>;</div>
-        <div class="cl"><span class="ln">8</span></div>
-        <div class="cl"><span class="ln">9</span>&nbsp;&nbsp;<span class="kw">public</span> <span class="ty">string[]</span> skills&nbsp;= {</div>
-        <div class="cl"><span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">"Unity3D"</span>, <span class="st">"C#"</span>, <span class="st">"AR/VR"</span>,</div>
-        <div class="cl"><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">"Shaders"</span>, <span class="st">"DOTS"</span>, <span class="st">"iOS"</span></div>
-        <div class="cl"><span class="ln">12</span>&nbsp;&nbsp;};</div>
-        <div class="cl"><span class="ln">13</span></div>
-        <div class="cl"><span class="ln">14</span>&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="fn">Start</span>() {</div>
-        <div class="cl"><span class="ln">15</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">BuildAwesomeThings</span>();</div>
-        <div class="cl"><span class="ln">16</span>&nbsp;&nbsp;}</div>
-        <div class="cl"><span class="ln">17</span>}</div>
-        <div class="cl"><span class="ln">18</span><span class="cb"></span></div>
+
+      <div class="work-card glass reveal" style="transition-delay:.08s" data-type="game"
+        data-title="НАЗВАНИЕ ИГРЫ 2"
+        data-desc="Описание второй игры. Жанр, основные механики, целевая аудитория и платформа. Укажите интересные технические решения или сложности, которые вы преодолели при разработке."
+        data-tech="Unity,C#,2D,Physics"
+        data-platform="PC / Mac"
+        data-year="2023"
+        data-status="В релизе"
+        data-link1-label="Играть" data-link1-url="#"
+        data-link2-label="Трейлер" data-link2-url="#"
+        data-slides="🕹️,🎮"
+        data-bg="linear-gradient(135deg,rgba(60,10,120,.5),rgba(10,80,200,.3))">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(60,10,120,.5),rgba(10,80,200,.3))">🕹️
+          <span class="work-badge badge-game">Игра</span>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 2</div>
+          <div class="work-desc">Жанр, основные механики, целевая платформа и ключевые технические решения.</div>
+          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">2D</span><span class="ttag">Physics</span></div>
+        </div>
       </div>
+
+      <div class="work-card glass reveal" style="transition-delay:.16s" data-type="game"
+        data-title="НАЗВАНИЕ ИГРЫ 3"
+        data-desc="Описание третьей игры. Можно добавить статистику — рейтинг, количество скачиваний. Расскажите об интересных фактах из разработки и о том, как вы решали технические задачи."
+        data-tech="Unity 3D,C#,Shader Graph,PC"
+        data-platform="PC / Steam"
+        data-year="2023"
+        data-status="Early Access"
+        data-link1-label="Скачать" data-link1-url="#"
+        data-link2-label="App Store" data-link2-url="#"
+        data-slides="👾,🎮,🕹️"
+        data-bg="linear-gradient(135deg,rgba(10,100,80,.4),rgba(20,40,140,.4))">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(10,100,80,.4),rgba(20,40,140,.4))">👾
+          <span class="work-badge badge-game">Игра</span>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 3</div>
+          <div class="work-desc">Рейтинг, количество скачиваний, интересные факты о разработке.</div>
+          <div class="work-tech"><span class="ttag">Unity 3D</span><span class="ttag">Shader</span><span class="ttag">PC</span></div>
+        </div>
+      </div>
+
+      <div class="work-card glass reveal" style="transition-delay:.24s" data-type="game"
+        data-title="НАЗВАНИЕ ИГРЫ 4"
+        data-desc="Описание четвёртой игры. Особые фичи — AR, мультиплеер, процедурная генерация уровней. Расскажите почему выбрали именно эти технологии и какого эффекта достигли."
+        data-tech="Unity,C#,AR Foundation,Mobile"
+        data-platform="Android / iOS"
+        data-year="2022"
+        data-status="В релизе"
+        data-link1-label="Играть" data-link1-url="#"
+        data-link2-label="Подробнее" data-link2-url="#"
+        data-slides="🚀,🎮"
+        data-bg="linear-gradient(135deg,rgba(80,10,80,.5),rgba(30,10,120,.4))">
+        <div class="work-thumb" style="background:linear-gradient(135deg,rgba(80,10,80,.5),rgba(30,10,120,.4))">🚀
+          <span class="work-badge badge-game">Игра</span>
+        </div>
+        <div class="work-body">
+          <div class="work-title">НАЗВАНИЕ ИГРЫ 4</div>
+          <div class="work-desc">Платформы, жанр, особые фичи — AR, мультиплеер, процедурная генерация.</div>
+          <div class="work-tech"><span class="ttag">Unity</span><span class="ttag">AR</span><span class="ttag">Mobile</span></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -435,7 +704,7 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
       <div class="contact-h">Начнём проект?</div>
       <p class="contact-sub">Открыт для фриланса, долгосрочного сотрудничества<br>и просто интересных разговоров.</p>
       <div class="contact-links">
-        <a href="mailto:your@email.com" class="clnk">
+        <a href="/cdn-cgi/l/email-protection#95ecfae0e7d5f0f8f4fcf9bbf6faf8" class="clnk">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           Email
         </a>
@@ -459,42 +728,150 @@ footer{padding:32px 0;margin-top:140px;border-top:1px solid rgba(255,255,255,.06
 <footer>
   <div class="wrap">
     <div class="foot">
-      <span class="foot-copy">© 2025 <em>Ваше Имя</em>. Crafted in Unity spirit.</span>
-      <a href="#hero" class="foot-up">↑ Наверх</a>
+      <span class="foot-copy">© 2025 <em>SpaceLab</em>. Unity Games & Apps Studio.</span>
+      <a href="#logo-hero" class="foot-up">↑ Наверх</a>
     </div>
   </div>
 </footer>
 
+<!-- ══════════ MODAL ══════════ -->
+<div id="modal-backdrop" role="dialog" aria-modal="true">
+  <div id="modal">
+    <button id="modal-close" aria-label="Закрыть">✕</button>
+    <div id="modal-gallery">
+      <!-- aurora background reacts to cursor -->
+      <div id="modal-aurora">
+        <div class="au au1"></div>
+        <div class="au au2"></div>
+        <div class="au au3"></div>
+      </div>
+      <div id="modal-gallery-track"></div>
+      <!-- half-click zones instead of small buttons -->
+      <div class="gal-zone hidden" id="gal-zone-prev">
+        <div class="gal-zone-hint">‹</div>
+      </div>
+      <div class="gal-zone hidden" id="gal-zone-next">
+        <div class="gal-zone-hint">›</div>
+      </div>
+      <div id="gal-dots"></div>
+    </div>
+    <div id="modal-body">
+      <div class="modal-badge" id="modal-badge">Игра</div>
+      <div id="modal-title"></div>
+      <div id="modal-desc"></div>
+      <div class="modal-meta" id="modal-meta"></div>
+      <div id="modal-tech"></div>
+      <div id="modal-actions"></div>
+    </div>
+  </div>
+</div>
+
 <script>
-/* CURSOR */
+/* ── CURSOR ─────────────────────────────────────── */
+const isTouchDevice = window.matchMedia('(hover:none),(pointer:coarse)').matches;
 const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
 let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-(function loop(){
-  rx+=(mx-rx)*.16;ry+=(my-ry)*.16;
-  dot.style.left=mx+'px';dot.style.top=my+'px';
-  ring.style.left=rx+'px';ring.style.top=ry+'px';
-  requestAnimationFrame(loop);
-})();
-document.querySelectorAll('a,button,.work-card,.skill-card').forEach(el=>{
-  el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
-  el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
-});
+if(!isTouchDevice){
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function loop(){
+    rx+=(mx-rx)*.16;ry+=(my-ry)*.16;
+    dot.style.left=mx+'px';dot.style.top=my+'px';
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(loop);
+  })();
+}
+function bindHover(){
+  if(isTouchDevice)return;
+  document.querySelectorAll('a,button,.work-card,.skill-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
+  });
+}
+bindHover();
 
-/* SCROLL */
-const prog=document.getElementById('progress'),nav=document.getElementById('nav');
+/* ── LOGO CANVAS — star field + cursor repel ────── */
+(function(){
+  const cv = document.getElementById('logo-canvas');
+  if(!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, stars=[], mouseX=W/2, mouseY=H/2;
+
+  function resize(){ W=cv.width=cv.offsetWidth; H=cv.height=cv.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function Star(){
+    this.reset = function(){
+      this.x = Math.random()*W; this.y = Math.random()*H;
+      this.r = Math.random()*1.5+.3;
+      this.alpha = Math.random()*.6+.1;
+      this.vx = (Math.random()-.5)*.15; this.vy = (Math.random()-.5)*.15;
+      this.pulse = Math.random()*Math.PI*2;
+    };
+    this.reset();
+  }
+  for(let i=0;i<160;i++){ const s=new Star(); stars.push(s); }
+
+  document.getElementById('logo-hero').addEventListener('mousemove', e=>{
+    const r = cv.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+  });
+
+  /* letter magnetic float */
+  const letters = document.querySelectorAll('.wm-letter');
+  document.getElementById('logo-hero').addEventListener('mousemove', e=>{
+    const hero = document.getElementById('logo-hero').getBoundingClientRect();
+    const cx = hero.width/2, cy = hero.height/2;
+    const dx = (e.clientX - hero.left - cx)/cx;
+    const dy = (e.clientY - hero.top  - cy)/cy;
+    letters.forEach((l,i)=>{
+      const depth = (i % 3 + 1) * 3.5;
+      l.style.transform = `translate(${dx*depth}px,${dy*depth*.5}px)`;
+    });
+  });
+  document.getElementById('logo-hero').addEventListener('mouseleave', ()=>{
+    letters.forEach(l=>{ l.style.transform=''; });
+  });
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      /* cursor repulsion */
+      const ddx = s.x - mouseX, ddy = s.y - mouseY;
+      const dist = Math.sqrt(ddx*ddx+ddy*ddy);
+      if(dist < 120){
+        const force = (120-dist)/120;
+        s.x += ddx/dist * force * 1.8;
+        s.y += ddy/dist * force * 1.8;
+      }
+      s.x += s.vx; s.y += s.vy;
+      s.pulse += .012;
+      if(s.x<0)s.x=W; if(s.x>W)s.x=0;
+      if(s.y<0)s.y=H; if(s.y>H)s.y=0;
+      const a = s.alpha * (.7 + .3*Math.sin(s.pulse));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(174,220,255,${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── SCROLL PROGRESS (no nav) ────────────────────── */
+const prog=document.getElementById('progress');
 window.addEventListener('scroll',()=>{
   prog.style.width=(scrollY/(document.body.scrollHeight-innerHeight)*100)+'%';
-  nav.classList.toggle('scrolled',scrollY>40);
 });
 
-/* REVEAL */
+/* ── REVEAL ──────────────────────────────────────── */
 const io=new IntersectionObserver(entries=>{
   entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*60);});
 },{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-/* COUNTERS */
+/* ── COUNTERS ────────────────────────────────────── */
 const cio=new IntersectionObserver(entries=>{
   entries.forEach(e=>{
     if(!e.isIntersecting)return;
@@ -505,14 +882,14 @@ const cio=new IntersectionObserver(entries=>{
 },{threshold:.5});
 document.querySelectorAll('[data-target]').forEach(el=>cio.observe(el));
 
-/* BLOB PARALLAX */
+/* ── BLOB PARALLAX ───────────────────────────────── */
 const blobs=[...document.querySelectorAll('.blob')];
 document.addEventListener('mousemove',e=>{
   const nx=(e.clientX/innerWidth-.5)*2,ny=(e.clientY/innerHeight-.5)*2;
   blobs.forEach((b,i)=>{const f=[18,14,22,10][i];b.style.transform=`translate(${nx*f}px,${ny*f}px)`;});
 });
 
-/* CARD TILT */
+/* ── CARD TILT ───────────────────────────────────── */
 document.querySelectorAll('.work-card').forEach(card=>{
   card.addEventListener('mousemove',e=>{
     const r=card.getBoundingClientRect();
@@ -522,13 +899,144 @@ document.querySelectorAll('.work-card').forEach(card=>{
   card.addEventListener('mouseleave',()=>card.style.transform='');
 });
 
-/* SMOOTH SCROLL */
+/* ── SMOOTH SCROLL ───────────────────────────────── */
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     const t=document.querySelector(a.getAttribute('href'));
     if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
   });
 });
+
+/* ══════════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════════ */
+const backdrop=document.getElementById('modal-backdrop');
+const track=document.getElementById('modal-gallery-track');
+const dots=document.getElementById('gal-dots');
+const zonePrev=document.getElementById('gal-zone-prev');
+const zoneNext=document.getElementById('gal-zone-next');
+const gallery=document.getElementById('modal-gallery');
+const auBlobs=[...document.querySelectorAll('#modal-aurora .au')];
+let slideIdx=0, slideCount=0;
+
+function updateGallery(){
+  track.style.transform=`translateX(-${slideIdx*100}%)`;
+  document.querySelectorAll('.gal-dot').forEach((d,i)=>d.classList.toggle('active',i===slideIdx));
+  zonePrev.classList.toggle('hidden', slideIdx===0 || slideCount<=1);
+  zoneNext.classList.toggle('hidden', slideIdx===slideCount-1 || slideCount<=1);
+}
+
+/* half-click zones */
+zonePrev.addEventListener('click',e=>{e.stopPropagation();if(slideIdx>0){slideIdx--;updateGallery();}});
+zoneNext.addEventListener('click',e=>{e.stopPropagation();if(slideIdx<slideCount-1){slideIdx++;updateGallery();}});
+
+/* aurora follows cursor inside gallery */
+gallery.addEventListener('mousemove',e=>{
+  const r=gallery.getBoundingClientRect();
+  const nx=(e.clientX-r.left)/r.width;
+  const ny=(e.clientY-r.top)/r.height;
+  const ox=(nx-.5)*80, oy=(ny-.5)*60;
+  auBlobs[0].style.transform=`translate(${ox*.9}px,${oy*.7}px)`;
+  auBlobs[1].style.transform=`translate(${-ox*.7}px,${-oy*.6}px)`;
+  auBlobs[2].style.transform=`translate(${ox*.5}px,${-oy*.9}px)`;
+});
+gallery.addEventListener('mouseleave',()=>{
+  auBlobs.forEach(b=>{b.style.transition='transform .6s ease';b.style.transform='';setTimeout(()=>b.style.transition='',600);});
+});
+
+function openModal(card){
+  const d=card.dataset;
+  const isGame=d.type==='game';
+
+  const badge=document.getElementById('modal-badge');
+  badge.textContent=isGame?'Игра':'Приложение';
+  badge.className='modal-badge '+(isGame?'badge-game':'badge-app');
+
+  document.getElementById('modal-title').textContent=d.title||'';
+  document.getElementById('modal-desc').textContent=d.desc||'';
+
+  const meta=document.getElementById('modal-meta');
+  meta.innerHTML='';
+  [['Платформа',d.platform],['Год',d.year],['Статус',d.status]].forEach(([label,val])=>{
+    if(!val)return;
+    meta.innerHTML+=`<div class="meta-item"><div class="meta-label">${label}</div><div class="meta-val">${val}</div></div>`;
+  });
+
+  document.getElementById('modal-tech').innerHTML=(d.tech||'').split(',').filter(Boolean)
+    .map(t=>`<span class="ttag">${t.trim()}</span>`).join('');
+
+  const actEl=document.getElementById('modal-actions');
+  actEl.innerHTML='';
+  if(d.link1Label&&d.link1Url)
+    actEl.innerHTML+=`<a href="${d.link1Url}" class="btn btn-solid" target="_blank" rel="noopener">${d.link1Label} →</a>`;
+  if(d.link2Label&&d.link2Url)
+    actEl.innerHTML+=`<a href="${d.link2Url}" class="btn btn-glass glass" target="_blank" rel="noopener">${d.link2Label}</a>`;
+
+  const slides=(d.slides||'').split(',').filter(Boolean);
+  slideCount=Math.max(slides.length,1);
+  slideIdx=0;
+  track.innerHTML='';
+  dots.innerHTML='';
+
+  slides.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='modal-slide';
+    if(s.trim().match(/[./]/)){
+      div.innerHTML=`<img src="${s.trim()}" alt="Screenshot ${i+1}" loading="lazy">`;
+    } else {
+      div.style.background=d.bg||'linear-gradient(135deg,rgba(20,40,120,.4),rgba(80,20,180,.3))';
+      div.textContent=s.trim();
+    }
+    track.appendChild(div);
+    if(slideCount>1){
+      const dot=document.createElement('div');
+      dot.className='gal-dot'+(i===0?' active':'');
+      dot.addEventListener('click',()=>{slideIdx=i;updateGallery();});
+      dots.appendChild(dot);
+    }
+  });
+
+  updateGallery();
+  document.body.style.overflow='hidden';
+  backdrop.classList.add('open');
+  bindHover();
+}
+
+function closeModal(){
+  backdrop.classList.remove('open');
+  document.body.style.overflow='';
+}
+
+document.querySelectorAll('.work-card').forEach(card=>{
+  card.addEventListener('click',e=>{
+    if(e.target.closest('.wlnk'))return;
+    openModal(card);
+  });
+});
+
+document.getElementById('modal-close').addEventListener('click',closeModal);
+backdrop.addEventListener('click',e=>{if(e.target===backdrop)closeModal();});
+document.addEventListener('keydown',e=>{
+  if(!backdrop.classList.contains('open'))return;
+  if(e.key==='Escape')closeModal();
+  if(e.key==='ArrowLeft'&&slideIdx>0){slideIdx--;updateGallery();}
+  if(e.key==='ArrowRight'&&slideIdx<slideCount-1){slideIdx++;updateGallery();}
+});
+
+/* touch swipe */
+let touchX=null;
+track.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;},{passive:true});
+track.addEventListener('touchend',e=>{
+  if(touchX===null)return;
+  const dx=e.changedTouches[0].clientX-touchX;
+  if(Math.abs(dx)>40){
+    if(dx<0&&slideIdx<slideCount-1){slideIdx++;updateGallery();}
+    if(dx>0&&slideIdx>0){slideIdx--;updateGallery();}
+  }
+  touchX=null;
+},{passive:true});
+
+/* END of script */
 </script>
 </body>
 </html>
